@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GMO 対稼働計算ツール 2025</title>
+  <!-- Google Fonts: Roboto -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #4285f4;
+      --primary-hover: #357ae8;
+      --bg-color: #f0f4f8;
+      --card-bg: #ffffff;
+      --text-color: #333;
+      --success-color: #34A853;
+      --error-color: #EA4335;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: var(--bg-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 500px;
+      border-radius: 8px;
+      padding: 40px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-color);
+    }
+    
+    .input-group {
+      margin-bottom: 1.2rem;
+    }
+    
+    .input-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #777;
+      font-size: 0.9rem;
+    }
+    
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      transition: border 0.3s;
+    }
+    
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 5px rgba(66, 133, 244, 0.3);
+    }
+    
+    button {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary-color);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    button:hover {
+      background: var(--primary-hover);
+    }
+    
+    .result {
+      margin-top: 2rem;
+      text-align: left;
+      font-size: 0.95rem;
+      color: var(--text-color);
+    }
+    
+    .result p {
+      margin-bottom: 0.8rem;
+    }
+    
+    .deviation {
+      margin-top: 1.5rem;
+      padding: 20px;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 500;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.03);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>GMO 対稼働計算ツール 2025</h1>
+    <div class="input-group">
+      <label for="target">月間目標（万円）</label>
+      <input type="number" id="target" step="0.01" placeholder="例: 100">
+    </div>
+    <div class="input-group">
+      <label for="sales">売上数字（万円）</label>
+      <input type="number" id="sales" step="0.01" placeholder="例: 60">
+    </div>
+    <button id="calcButton" onclick="calculate()">計算する</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    // 2025年の祝日リスト（例）
+    // ※ 2月は建国記念の日（2025-02-11）と、
+    //    天皇誕生日が2025-02-23（日）なので、その振替休日（2025-02-24）を含め、
+    //    2月の総営業日が18日となるよう調整しています。
+    var holidays = [
+      "2025-01-01", // 元日
+      "2025-01-13", // 成人の日
+      "2025-02-11", // 建国記念の日
+      "2025-02-23", // 天皇誕生日（※日曜日の場合）
+      "2025-02-24", // 振替休日
+      "2025-03-20", // 春分の日
+      "2025-04-29", // 昭和の日
+      "2025-05-03", // 憲法記念日
+      "2025-05-04", // みどりの日
+      "2025-05-05", // こどもの日
+      "2025-07-21", // 海の日
+      "2025-08-11", // 山の日
+      "2025-09-15", // 敬老の日
+      "2025-09-23", // 秋分の日
+      "2025-10-13", // スポーツの日
+      "2025-11-03", // 文化の日
+      "2025-11-23"  // 勤労感謝の日
+    ];
+
+    // 指定した日付が祝日かどうかを判定する
+    function isHoliday(date) {
+      var yyyy = date.getFullYear();
+      var mm = ('0' + (date.getMonth() + 1)).slice(-2);
+      var dd = ('0' + date.getDate()).slice(-2);
+      var formatted = yyyy + '-' + mm + '-' + dd;
+      return holidays.indexOf(formatted) !== -1;
+    }
+
+    // 指定した年月の総営業日数（平日かつ祝日除外）
+    function countBusinessDays(year, month) {
+      var lastDay = new Date(year, month + 1, 0);
+      var numDays = lastDay.getDate();
+      var count = 0;
+      for (var day = 1; day <= numDays; day++) {
+        var d = new Date(year, month, day);
+        var weekday = d.getDay();
+        if (weekday !== 0 && weekday !== 6 && !isHoliday(d)) {
+          count++;
+        }
+      }
+      return count;
+    }
+
+    // 当月初日から「昨日」までの営業日数（平日かつ祝日除外）を計算
+    function countElapsedBusinessDays(year, month, lastDay) {
+      var count = 0;
+      for (var day = 1; day <= lastDay; day++) {
+        var d = new Date(year, month, day);
+        var weekday = d.getDay();
+        if (weekday !== 0 && weekday !== 6 && !isHoliday(d)) {
+          count++;
+        }
+      }
+      return count;
+    }
+
+    function calculate() {
+      var targetInput = document.getElementById('target').value;
+      var salesInput = document.getElementById('sales').value;
+      var resultDiv = document.getElementById('result');
+
+      if (targetInput === '' || salesInput === '') {
+        resultDiv.innerHTML = '<p style="color: var(--error-color);">月間目標と売上数字の両方を入力してください。</p>';
+        return;
+      }
+
+      var target = parseFloat(targetInput);
+      var sales = parseFloat(salesInput);
+
+      // 現在の日付情報
+      var today = new Date();
+      var year = today.getFullYear();
+      var month = today.getMonth();
+
+      // 「昨日」の日付を計算（今日が1日の場合、昨日は前月なので進捗は0）
+      var yesterday = new Date(today.getTime() - 86400000);
+      var elapsedBusinessDays = (yesterday.getMonth() === month)
+          ? countElapsedBusinessDays(year, month, yesterday.getDate())
+          : 0;
+
+      // 当月の総営業日数（祝日・週末除外）
+      var totalBusinessDays = countBusinessDays(year, month);
+
+      // 計算（すべて「昨日まで」の進捗で算出）
+      var dailyRequired = target / totalBusinessDays;
+      var expectedProgress = dailyRequired * elapsedBusinessDays;
+      var deviation = sales - expectedProgress;
+
+      // 対稼働の色（正なら緑、負なら赤）
+      var deviationColor = (deviation >= 0) ? 'var(--success-color)' : 'var(--error-color)';
+
+      var output  = '<p>今月の総営業日数： ' + totalBusinessDays + ' 日</p>';
+      output += '<p>昨日までの営業日数： ' + elapsedBusinessDays + ' 日</p>';
+      output += '<p>1日あたりの目標進捗額： ' + dailyRequired.toFixed(2) + ' 万円</p>';
+      output += '<p>昨日までの期待進捗額： ' + expectedProgress.toFixed(2) + ' 万円</p>';
+      output += '<div class="deviation" style="color:' + deviationColor + ';">対稼働（実績との差）： ' + deviation.toFixed(2) + ' 万円</div>';
+
+      resultDiv.innerHTML = output;
+    }
+
+    // エンターキーで計算実行
+    document.getElementById('target').addEventListener('keyup', function(event) {
+      if (event.key === 'Enter') {
+        calculate();
+      }
+    });
+    document.getElementById('sales').addEventListener('keyup', function(event) {
+      if (event.key === 'Enter') {
+        calculate();
+      }
+    });
+  </script>
+</body>
+</html>

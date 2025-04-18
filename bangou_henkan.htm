@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>電話番号正規ハイフン自動挿入装置</title>
+  <!-- Google Fonts の読み込み（Noto Sans JP） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 2em;
+      max-width: 600px;
+      width: 90%;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 0.5em;
+    }
+    p.description {
+      text-align: center;
+      color: #666;
+      font-size: 1rem;
+      margin-bottom: 1.5em;
+      line-height: 1.5;
+    }
+    textarea {
+      width: 100%;
+      padding: 0.8em 1em;
+      margin-bottom: 1em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      resize: vertical;
+      min-height: 200px;
+    }
+    /* 変換ボタンのデザイン */
+    button#convert {
+      display: block;
+      width: 100%;
+      padding: 0.9em;
+      background: linear-gradient(45deg, #007bff, #00aaff);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-bottom: 1.5em;
+    }
+    button#convert:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    /* クレジット表記 */
+    p.credit {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #999;
+      margin-top: 1em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>電話番号正規ハイフン自動挿入装置</h1>
+    <p class="description">
+      ハイフン無しの電話番号 (1行につき1番号)を入力し、「変換」ボタンを押すと、市外局番の正規ルールに基づいてハイフンを挿入します。<br>
+      ※裏技※ ハイフン付きの番号を入れても正規表現に挿入し直すよ。
+    </p>
+    <textarea id="input" placeholder="例:
+0989757473
+09097518762
+0353649358
+0899791880"></textarea>
+    <button id="convert">変換</button>
+    <textarea id="output" placeholder="変換結果" readonly></textarea>
+    <p class="credit">by 斧口</p>
+  </div>
+  
+  <script>
+    // 全角数字を半角に変換する関数
+    function toHalfWidth(str) {
+      return str.replace(/[０-９]/g, function(ch) {
+        return String.fromCharCode(ch.charCodeAt(0) - 0xFEE0);
+      });
+    }
+    
+    function formatJapanesePhoneNumber(input) {
+      // まず全角数字を半角に変換し、非数字は除去
+      input = toHalfWidth(input);
+      let num = input.replace(/\D/g, "");
+      if(num === "") return "";
+      
+      // 11桁の場合：携帯電話等 → 3-4-4 の形式
+      if(num.length === 11) {
+        return num.substring(0,3) + "-" + num.substring(3,7) + "-" + num.substring(7);
+      }
+      
+      // 10桁の場合
+      if(num.length === 10) {
+        // 先頭が「03」または「06」で始まる場合 → 2-4-4 の形式
+        if(num.startsWith("03") || num.startsWith("06")) {
+          return num.substring(0,2) + "-" + num.substring(2,6) + "-" + num.substring(6);
+        } else {
+          // それ以外 → 3-3-4 の形式
+          return num.substring(0,3) + "-" + num.substring(3,6) + "-" + num.substring(6);
+        }
+      }
+      
+      // 桁数が異なる場合は、そのまま返す
+      return num;
+    }
+    
+    document.getElementById("convert").addEventListener("click", function() {
+      const inputText = document.getElementById("input").value;
+      const lines = inputText.split(/\r?\n/);
+      const outputLines = lines.map(line => {
+        const trimmed = line.trim();
+        if(trimmed === "") return "";
+        return formatJapanesePhoneNumber(trimmed);
+      });
+      document.getElementById("output").value = outputLines.join("\n");
+    });
+  </script>
+</body>
+</html>

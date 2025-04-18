@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>GMO ツールポータル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 800px;
+      width: 90%;
+      background: #fff;
+      padding: 2em;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1.5em;
+      color: #333;
+    }
+    .tool-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.2em;
+    }
+    @media (min-width: 600px) {
+      .tool-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .tool-card {
+      background: #e6f2ff;
+      padding: 1.5em;
+      border-radius: 10px;
+      text-decoration: none;
+      color: #333;
+      font-size: 1.1rem;
+      font-weight: 500;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .tool-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      background: #d8ecff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>GMO ツールポータル</h1>
+    <div class="tool-grid">
+      <a class="tool-card" href="seisansei.html">GMO 生産性判定ツール</a>
+      <a class="tool-card" href="taikadou2025.html">GMO 対稼働計算ツール</a>
+      <a class="tool-card" href="bangou_henkan.htm">GMO 電話番号ハイフン挿入ツール</a>
+    </div>
+  </div>
+</body>
+</html>
