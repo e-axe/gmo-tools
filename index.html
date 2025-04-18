@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -68,23 +70,12 @@
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
       background: linear-gradient(135deg, #bbdefb, #90caf9);
     }
-    .tool-card:nth-child(1)::before {
-      content: "\1F4B0"; /* 💰 お金系 */
-      font-size: 2rem;
+    .tool-card svg {
       display: block;
-      margin-bottom: 0.5em;
-    }
-    .tool-card:nth-child(2)::before {
-      content: "\1F4BB"; /* 💻 そのまま */
-      font-size: 2rem;
-      display: block;
-      margin-bottom: 0.5em;
-    }
-    .tool-card:nth-child(3)::before {
-      content: "\260E"; /* ☎ 電話 */
-      font-size: 2rem;
-      display: block;
-      margin-bottom: 0.5em;
+      margin: 0 auto 0.5em;
+      width: 40px;
+      height: 40px;
+      stroke: #1a237e;
     }
     .credit {
       margin-top: 3em;
@@ -97,11 +88,23 @@
   <div class="container">
     <h1>GMO ツールポータル</h1>
     <div class="tool-grid">
-      <a class="tool-card" href="seisansei.html">GMO 生産性判定ツール</a>
-      <a class="tool-card" href="taikadou2025.html">GMO 対稼働計算ツール</a>
-      <a class="tool-card" href="bangou_henkan.htm">GMO 電話番号ハイフン挿入ツール</a>
+      <a class="tool-card" href="seisansei.html">
+        <svg data-lucide="coins"></svg>
+        <div>GMO 生産性判定ツール</div>
+      </a>
+      <a class="tool-card" href="taikadou2025.html">
+        <svg data-lucide="layout-dashboard"></svg>
+        <div>GMO 対稼働計算ツール</div>
+      </a>
+      <a class="tool-card" href="bangou_henkan.htm">
+        <svg data-lucide="phone"></svg>
+        <div>GMO 電話番号ハイフン挿入ツール</div>
+      </a>
     </div>
     <p class="credit">by 斧口</p>
   </div>
+  <script>
+    lucide.createIcons();
+  </script>
 </body>
 </html>
