@@ -62,7 +62,7 @@
     button:hover {
       background: #0056b3;
     }
-    /* 結果表示エリア（枠で囲む） */
+    /* 結果表示エリア */
     #result {
       text-align: center;
       margin: 20px 0 30px 0;
@@ -91,20 +91,14 @@
 <body>
   <div class="container">
     <h1>GMO 生産性判定装置</h1>
-    
-    <!-- フォーム（Enterキーで送信可能） -->
     <form id="calcForm">
       <label for="sales">営業成績（実績）の金額 (万円):</label>
       <input type="number" id="sales" placeholder="例: 80" step="any" required>
-      
       <label for="hours">クール数（時間）:</label>
       <input type="number" id="hours" placeholder="例: 120" step="any" required>
-      
       <button type="submit">計算する</button>
     </form>
-    
     <div id="result"></div>
-    
     <h2>次月の時給テーブル</h2>
     <table>
       <thead>
@@ -114,111 +108,59 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>15,000 以上</td>
-          <td>3,900</td>
-        </tr>
-        <tr>
-          <td>13,500 ～ 15,000 未満</td>
-          <td>3,600</td>
-        </tr>
-        <tr>
-          <td>12,000 ～ 13,500 未満</td>
-          <td>3,300</td>
-        </tr>
-        <tr>
-          <td>10,500 ～ 12,000 未満</td>
-          <td>3,000</td>
-        </tr>
-        <tr>
-          <td>9,000 ～ 10,500 未満</td>
-          <td>2,700</td>
-        </tr>
-        <tr>
-          <td>7,500 ～ 9,000 未満</td>
-          <td>2,400</td>
-        </tr>
-        <tr>
-          <td>6,000 ～ 7,500 未満</td>
-          <td>2,100</td>
-        </tr>
-        <tr>
-          <td>4,500 ～ 6,000 未満</td>
-          <td>1,850</td>
-        </tr>
-        <tr>
-          <td>3,000 ～ 4,500 未満</td>
-          <td>1,650</td>
-        </tr>
-        <tr>
-          <td>3,000 未満</td>
-          <td>1,500</td>
-        </tr>
+        <tr><td>15,000 以上</td><td>3,900</td></tr>
+        <tr><td>13,500 ～ 15,000 未満</td><td>3,600</td></tr>
+        <tr><td>12,000 ～ 13,500 未満</td><td>3,300</td></tr>
+        <tr><td>10,500 ～ 12,000 未満</td><td>3,000</td></tr>
+        <tr><td>9,000 ～ 10,500 未満</td><td>2,700</td></tr>
+        <tr><td>7,500 ～ 9,000 未満</td><td>2,400</td></tr>
+        <tr><td>6,000 ～ 7,500 未満</td><td>2,100</td></tr>
+        <tr><td>4,500 ～ 6,000 未満</td><td>1,850</td></tr>
+        <tr><td>3,000 ～ 4,500 未満</td><td>1,650</td></tr>
+        <tr><td>3,000 未満</td><td>1,500</td></tr>
       </tbody>
     </table>
   </div>
   <p style="margin-top: 2em; font-size: 0.85rem; text-align: center; color: #777;">by 斧口</p>
-
   <script>
-    // フォームの送信（Enterキー含む）で計算を実行
     document.getElementById("calcForm").addEventListener("submit", function(event) {
       event.preventDefault();
       calculate();
     });
-    
+
     function calculate() {
       var salesInput = parseFloat(document.getElementById("sales").value);
       var hours = parseFloat(document.getElementById("hours").value);
       var resultDiv = document.getElementById("result");
-      
       if (isNaN(salesInput) || isNaN(hours) || hours <= 0) {
         resultDiv.innerHTML = "<p style='color:red;'>正しい値を入力してください。</p>";
         return;
       }
-      
       var sales = salesInput * 10000;
       var productivity = sales / hours;
       var wage = 0;
-      
-      if (productivity >= 15000) {
-        wage = 3900;
-      } else if (productivity >= 13500) {
-        wage = 3600;
-      } else if (productivity >= 12000) {
-        wage = 3300;
-      } else if (productivity >= 10500) {
-        wage = 3000;
-      } else if (productivity >= 9000) {
-        wage = 2700;
-      } else if (productivity >= 7500) {
-        wage = 2400;
-      } else if (productivity >= 6000) {
-        wage = 2100;
-      } else if (productivity >= 4500) {
-        wage = 1850;
-      } else if (productivity >= 3000) {
-        wage = 1650;
-      } else {
-        wage = 1500;
-      }
-      
-      // 次の生産性閾値と時給のマッピング
+      if (productivity >= 15000) wage = 3900;
+      else if (productivity >= 13500) wage = 3600;
+      else if (productivity >= 12000) wage = 3300;
+      else if (productivity >= 10500) wage = 3000;
+      else if (productivity >= 9000) wage = 2700;
+      else if (productivity >= 7500) wage = 2400;
+      else if (productivity >= 6000) wage = 2100;
+      else if (productivity >= 4500) wage = 1850;
+      else if (productivity >= 3000) wage = 1650;
+      else wage = 1500;
       var mapping = [
-        { threshold: 3000, wage: 1650 },
-        { threshold: 4500, wage: 1850 },
-        { threshold: 6000, wage: 2100 },
-        { threshold: 7500, wage: 2400 },
-        { threshold: 9000, wage: 2700 },
-        { threshold: 10500, wage: 3000 },
-        { threshold: 12000, wage: 3300 },
-        { threshold: 13500, wage: 3600 },
-        { threshold: 15000, wage: 3900 }
+        {threshold:3000, wage:1650},
+        {threshold:4500, wage:1850},
+        {threshold:6000, wage:2100},
+        {threshold:7500, wage:2400},
+        {threshold:9000, wage:2700},
+        {threshold:10500, wage:3000},
+        {threshold:12000, wage:3300},
+        {threshold:13500, wage:3600},
+        {threshold:15000, wage:3900}
       ];
-      
-      // 「次の」閾値を探す
-      var nextThreshold = null;
-      var nextWage = null;
-      var nextIndex = -1;
+      var nextThreshold = null, nextWage = null, nextIndex = -1;
       for (var i = 0; i < mapping.length; i++) {
         if (productivity < mapping[i].threshold) {
           nextThreshold = mapping[i].threshold;
@@ -227,31 +169,26 @@
           break;
         }
       }
-      
-      // 「さらに次の」閾値を探す（nextIndex+1 があれば）
-      var secondThreshold = null;
-      var secondWage = null;
+      var secondThreshold = null, secondWage = null;
       if (nextIndex >= 0 && nextIndex + 1 < mapping.length) {
         secondThreshold = mapping[nextIndex + 1].threshold;
         secondWage = mapping[nextIndex + 1].wage;
       }
-      
-      // 追加メッセージ作成
       var additionalMessage = "";
       if (nextThreshold !== null) {
-        // 「次の時給」までに必要な売上
-        var additionalNeeded = (nextThreshold - productivity) * hours;
-        var additionalNeededMan = additionalNeeded / 10000;
-        var formattedNextWage = nextWage.toLocaleString('ja-JP');
-        var formattedAdditionalNeededMan = additionalNeededMan.toLocaleString('ja-JP');
-        
-        additionalMessage = "<br>次の時給 (" + formattedNextWage +
-          "円)に到達するには、あと 「<span style='font-weight: bold; font-size: 1.5em;'>" +
-          formattedAdditionalNeededMan + "</span>」 万円の売上が必要です。";
-        
-        // 「さらに次の時給」までに必要な売上
+        var add = (nextThreshold - productivity) * hours;
+        var addMan = add / 10000;
+        additionalMessage = "<br>次の時給 (" + nextWage.toLocaleString('ja-JP') + "円)に到達するには、あと 「<span style='font-weight:bold; font-size:1.5em;'>" + addMan.toLocaleString('ja-JP') + "</span>」 万円の売上が必要です。";
         if (secondThreshold !== null) {
-          var additionalNeeded2 = (secondThreshold - productivity) * hours;
-          var additionalNeededMan2 = additionalNeeded2 / 10000;
-          var formattedSecondWage = secondWage.toLocaleString('ja-JP');
-          var formattedAdditionalNeededMan2 = additional
+          var add2 = (secondThreshold - productivity) * hours;
+          var addMan2 = add2 / 10000;
+          additionalMessage += "<br>さらに次の時給 (" + secondWage.toLocaleString('ja-JP') + "円)に到達するには、あと 「<span style='font-weight:bold; font-size:1.5em;'>" + addMan2.toLocaleString('ja-JP') + "</span>」 万円の売上が必要です。";
+        }
+      } else {
+        additionalMessage = "<br>既に最高の生産性です。";
+      }
+      resultDiv.innerHTML = "<strong style='font-size:1.5em;'>計算結果</strong><br>生産性: <span style='font-weight:bold; font-size:1.5em;'>" + productivity.toLocaleString('ja-JP',{minimumFractionDigits:2,maximumFractionDigits:2}) + "</span> 円<br>次月の時給: <span style='font-weight:bold; font-size:2em;'>" + wage.toLocaleString('ja-JP') + "</span> 円" + additionalMessage;
+    }
+  </script>
+</body>
+</html>
