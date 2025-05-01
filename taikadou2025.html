@@ -131,14 +131,11 @@
 
   <script>
     // 2025年の祝日リスト（例）
-    // ※ 2月は建国記念の日（2025-02-11）と、
-    //    天皇誕生日が2025-02-23（日）なので、その振替休日（2025-02-24）を含め、
-    //    2月の総営業日が18日となるよう調整しています。
     var holidays = [
       "2025-01-01", // 元日
       "2025-01-13", // 成人の日
       "2025-02-11", // 建国記念の日
-      "2025-02-23", // 天皇誕生日（※日曜日の場合）
+      "2025-02-23", // 天皇誕生日
       "2025-02-24", // 振替休日
       "2025-03-20", // 春分の日
       "2025-04-29", // 昭和の日
@@ -152,11 +149,10 @@
       "2025-09-23", // 秋分の日
       "2025-10-13", // スポーツの日
       "2025-11-03", // 文化の日
-      "2025-11-23"  // 勤労感謝の日
+      "2025-11-23", // 勤労感謝の日
       "2025-11-24"  // 振替休日
     ];
 
-    // 指定した日付が祝日かどうかを判定する
     function isHoliday(date) {
       var yyyy = date.getFullYear();
       var mm = ('0' + (date.getMonth() + 1)).slice(-2);
@@ -165,7 +161,6 @@
       return holidays.indexOf(formatted) !== -1;
     }
 
-    // 指定した年月の総営業日数（平日かつ祝日除外）
     function countBusinessDays(year, month) {
       var lastDay = new Date(year, month + 1, 0);
       var numDays = lastDay.getDate();
@@ -180,7 +175,6 @@
       return count;
     }
 
-    // 当月初日から「昨日」までの営業日数（平日かつ祝日除外）を計算
     function countElapsedBusinessDays(year, month, lastDay) {
       var count = 0;
       for (var day = 1; day <= lastDay; day++) {
@@ -206,26 +200,18 @@
       var target = parseFloat(targetInput);
       var sales = parseFloat(salesInput);
 
-      // 現在の日付情報
       var today = new Date();
       var year = today.getFullYear();
       var month = today.getMonth();
-
-      // 「昨日」の日付を計算（今日が1日の場合、昨日は前月なので進捗は0）
       var yesterday = new Date(today.getTime() - 86400000);
       var elapsedBusinessDays = (yesterday.getMonth() === month)
           ? countElapsedBusinessDays(year, month, yesterday.getDate())
           : 0;
 
-      // 当月の総営業日数（祝日・週末除外）
       var totalBusinessDays = countBusinessDays(year, month);
-
-      // 計算（すべて「昨日まで」の進捗で算出）
       var dailyRequired = target / totalBusinessDays;
       var expectedProgress = dailyRequired * elapsedBusinessDays;
       var deviation = sales - expectedProgress;
-
-      // 対稼働の色（正なら緑、負なら赤）
       var deviationColor = (deviation >= 0) ? 'var(--success-color)' : 'var(--error-color)';
 
       var output  = '<p>今月の総営業日数： ' + totalBusinessDays + ' 日</p>';
@@ -237,16 +223,11 @@
       resultDiv.innerHTML = output;
     }
 
-    // エンターキーで計算実行
     document.getElementById('target').addEventListener('keyup', function(event) {
-      if (event.key === 'Enter') {
-        calculate();
-      }
+      if (event.key === 'Enter') calculate();
     });
     document.getElementById('sales').addEventListener('keyup', function(event) {
-      if (event.key === 'Enter') {
-        calculate();
-      }
+      if (event.key === 'Enter') calculate();
     });
   </script>
 </body>
