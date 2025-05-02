@@ -10,82 +10,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     /* 全体の基本スタイル */
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: #f7f7f7;
-      margin: 0;
-      padding: 0;
-      color: #333;
-    }
-    .container {
-      max-width: 600px;
-      margin: 40px auto;
-      background: #fff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    h1, h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #444;
-    }
+    body { font-family: 'Roboto', sans-serif; background: #f7f7f7; margin: 0; padding: 0; color: #333; }
+    .container { max-width: 600px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h1, h2 { text-align: center; margin-bottom: 20px; color: #444; }
     /* フォーム */
-    form {
-      margin-bottom: 30px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
-    input[type="number"] {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      margin-bottom: 15px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #007BFF;
-      border: none;
-      color: #fff;
-      font-size: 18px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #0056b3;
-    }
+    form { margin-bottom: 30px; }
+    label { display: block; margin-bottom: 5px; font-weight: 500; }
+    input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; background: #007BFF; border: none; color: #fff; font-size: 18px; border-radius: 4px; cursor: pointer; transition: background 0.3s; }
+    button:hover { background: #0056b3; }
     /* 結果表示エリア */
-    #result {
-      text-align: center;
-      margin: 20px 0 30px 0;
-      padding: 20px;
-      border: 2px solid #007BFF;
-      border-radius: 8px;
-      background: #e6f2ff;
-    }
+    #result { text-align: center; margin: 20px 0 30px; padding: 20px; border: 2px solid #007BFF; border-radius: 8px; background: #e6f2ff; }
     /* テーブル */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    table th, table td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: center;
-      font-size: 14px;
-    }
-    table th {
-      background: #f0f0f0;
-    }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    table th, table td { border: 1px solid #ddd; padding: 10px; text-align: center; font-size: 14px; }
+    table th { background: #f0f0f0; }
   </style>
 </head>
 <body>
@@ -96,42 +35,50 @@
       <input type="number" id="sales" placeholder="例: 80" step="any" required>
       <label for="hours">クール数（時間）:</label>
       <input type="number" id="hours" placeholder="例: 120" step="any" required>
-      <button type="submit">計算する</button>
+      <button type="button" id="calcBtn">計算する</button>
     </form>
     <div id="result"></div>
     <h2>次月の時給テーブル</h2>
-    <table>
+    <table id="wageTable">
       <thead>
         <tr>
           <th>生産性 (円)</th>
           <th>次月時間給 (円)</th>
+          <th>必要実績 (万円)</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>15,000 以上</td><td>3,900</td></tr>
-        <tr><td>13,500 ～ 15,000 未満</td><td>3,600</td></tr>
-        <tr><td>12,000 ～ 13,500 未満</td><td>3,300</td></tr>
-        <tr><td>10,500 ～ 12,000 未満</td><td>3,000</td></tr>
-        <tr><td>9,000 ～ 10,500 未満</td><td>2,700</td></tr>
-        <tr><td>7,500 ～ 9,000 未満</td><td>2,400</td></tr>
-        <tr><td>6,000 ～ 7,500 未満</td><td>2,100</td></tr>
-        <tr><td>4,500 ～ 6,000 未満</td><td>1,850</td></tr>
-        <tr><td>3,000 ～ 4,500 未満</td><td>1,650</td></tr>
-        <tr><td>3,000 未満</td><td>1,500</td></tr>
+        <tr data-threshold="15000"><td>15,000 以上</td><td>3,900</td><td class="need-sales">-</td></tr>
+        <tr data-threshold="13500"><td>13,500 ～ 15,000 未満</td><td>3,600</td><td class="need-sales">-</td></tr>
+        <tr data-threshold="12000"><td>12,000 ～ 13,500 未満</td><td>3,300</td><td class="need-sales">-</td></tr>
+        <tr data-threshold="10500"><td>10,500 ～ 12,000 未満</td><td>3,000</td><td class="need-sales">-</td></tr>
+        <tr data-threshold="9000"><td>9,000 ～ 10,500 未満</td><td>2,700</td><td class="need-sales">-</td></tr>
+        <tr data-threshold="7500"><td>7,500 ～ 9,000 未満</td><td>2,400</td><td class="need-sales">-</td></tr>
+        <tr data-threshold="6000"><td>6,000 ～ 7,500 未満</td><td>2,100</td><td class="need-sales">-</td></tr>
+        <tr data-threshold="4500"><td>4,500 ～ 6,000 未満</td><td>1,850</td><td class="need-sales">-</td></tr>
+        <tr data-threshold="3000"><td>3,000 ～ 4,500 未満</td><td>1,650</td><td class="need-sales">-</td></tr>
+        <tr data-threshold="0"><td>3,000 未満</td><td>1,500</td><td class="need-sales">-</td></tr>
       </tbody>
     </table>
   </div>
-  <p style="margin-top: 2em; font-size: 0.85rem; text-align: center; color: #777;">by 斧口</p>
+  <p style="margin-top:2em; font-size:0.85rem; text-align:center; color:#777;">by 斧口</p>
   <script>
-    document.getElementById("calcForm").addEventListener("submit", function(event) {
-      event.preventDefault();
-      calculate();
+    // 計算ボタン押下でcalculateを呼び出し
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+    // Enterキーでもcalculate
+    ['sales','hours'].forEach(function(id) {
+      document.getElementById(id).addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          calculate();
+        }
+      });
     });
 
     function calculate() {
-      var salesInput = parseFloat(document.getElementById("sales").value);
-      var hours = parseFloat(document.getElementById("hours").value);
-      var resultDiv = document.getElementById("result");
+      var salesInput = parseFloat(document.getElementById('sales').value);
+      var hours = parseFloat(document.getElementById('hours').value);
+      var resultDiv = document.getElementById('result');
       if (isNaN(salesInput) || isNaN(hours) || hours <= 0) {
         resultDiv.innerHTML = "<p style='color:red;'>正しい値を入力してください。</p>";
         return;
@@ -139,55 +86,68 @@
       var sales = salesInput * 10000;
       var productivity = sales / hours;
       var wage = 0;
-      if (productivity >= 15000) wage = 3900;
+      if      (productivity >= 15000) wage = 3900;
       else if (productivity >= 13500) wage = 3600;
       else if (productivity >= 12000) wage = 3300;
       else if (productivity >= 10500) wage = 3000;
-      else if (productivity >= 9000) wage = 2700;
-      else if (productivity >= 7500) wage = 2400;
-      else if (productivity >= 6000) wage = 2100;
-      else if (productivity >= 4500) wage = 1850;
-      else if (productivity >= 3000) wage = 1650;
-      else wage = 1500;
+      else if (productivity >= 9000)  wage = 2700;
+      else if (productivity >= 7500)  wage = 2400;
+      else if (productivity >= 6000)  wage = 2100;
+      else if (productivity >= 4500)  wage = 1850;
+      else if (productivity >= 3000)  wage = 1650;
+      else                             wage = 1500;
+
+      // 元の計算結果＋追加メッセージ
       var mapping = [
-        {threshold:3000, wage:1650},
-        {threshold:4500, wage:1850},
-        {threshold:6000, wage:2100},
-        {threshold:7500, wage:2400},
-        {threshold:9000, wage:2700},
-        {threshold:10500, wage:3000},
-        {threshold:12000, wage:3300},
-        {threshold:13500, wage:3600},
+        {threshold:3000, wage:1650}, {threshold:4500, wage:1850},
+        {threshold:6000, wage:2100},{threshold:7500, wage:2400},
+        {threshold:9000, wage:2700},{threshold:10500, wage:3000},
+        {threshold:12000, wage:3300},{threshold:13500, wage:3600},
         {threshold:15000, wage:3900}
       ];
-      var nextThreshold = null, nextWage = null, nextIndex = -1;
-      for (var i = 0; i < mapping.length; i++) {
-        if (productivity < mapping[i].threshold) {
-          nextThreshold = mapping[i].threshold;
-          nextWage = mapping[i].wage;
-          nextIndex = i;
-          break;
+      var nextThreshold=null,nextWage=null,nextIndex=-1;
+      for(var i=0;i<mapping.length;i++){
+        if(productivity<mapping[i].threshold){
+          nextThreshold=mapping[i].threshold;
+          nextWage=mapping[i].wage;
+          nextIndex=i;break;
         }
       }
-      var secondThreshold = null, secondWage = null;
-      if (nextIndex >= 0 && nextIndex + 1 < mapping.length) {
-        secondThreshold = mapping[nextIndex + 1].threshold;
-        secondWage = mapping[nextIndex + 1].wage;
+      var secondThreshold=null,secondWage=null;
+      if(nextIndex>=0 && nextIndex+1<mapping.length){
+        secondThreshold=mapping[nextIndex+1].threshold;
+        secondWage   =mapping[nextIndex+1].wage;
       }
-      var additionalMessage = "";
-      if (nextThreshold !== null) {
-        var add = (nextThreshold - productivity) * hours;
-        var addMan = add / 10000;
-        additionalMessage = "<br>次の時給 (" + nextWage.toLocaleString('ja-JP') + "円)に到達するには、あと 「<span style='font-weight:bold; font-size:1.5em;'>" + addMan.toLocaleString('ja-JP') + "</span>」 万円の売上が必要です。";
-        if (secondThreshold !== null) {
-          var add2 = (secondThreshold - productivity) * hours;
-          var addMan2 = add2 / 10000;
-          additionalMessage += "<br>さらに次の時給 (" + secondWage.toLocaleString('ja-JP') + "円)に到達するには、あと 「<span style='font-weight:bold; font-size:1.5em;'>" + addMan2.toLocaleString('ja-JP') + "</span>」 万円の売上が必要です。";
+      var additionalMessage="";
+      if(nextThreshold!==null){
+        var add   =(nextThreshold-productivity)*hours;
+        var addMan=add/10000;
+        additionalMessage="<br>次の時給 ("+nextWage.toLocaleString('ja-JP')+"円)に到達するには、あと 「<span style='font-weight:bold; font-size:1.5em;'>"+addMan.toLocaleString('ja-JP')+"</span>」 万円の実績が必要です。";
+        if(secondThreshold!==null){
+          var add2   =(secondThreshold-productivity)*hours;
+          var addMan2=add2/10000;
+          additionalMessage+="<br>さらに次の時給 ("+secondWage.toLocaleString('ja-JP')+"円)に到達するには、あと 「<span style='font-weight:bold; font-size:1.5em;'>"+addMan2.toLocaleString('ja-JP')+"</span>」 万円の実績が必要です。";
         }
       } else {
-        additionalMessage = "<br>既に最高の生産性です。";
+        additionalMessage="<br>既に最高の生産性です。";
       }
-      resultDiv.innerHTML = "<strong style='font-size:1.5em;'>計算結果</strong><br>生産性: <span style='font-weight:bold; font-size:1.5em;'>" + productivity.toLocaleString('ja-JP',{minimumFractionDigits:2,maximumFractionDigits:2}) + "</span> 円<br>次月の時給: <span style='font-weight:bold; font-size:2em;'>" + wage.toLocaleString('ja-JP') + "</span> 円" + additionalMessage;
+      resultDiv.innerHTML=
+        "<strong style='font-size:1.5em;'>計算結果</strong><br>"+
+        "生産性: <span style='font-weight:bold; font-size:1.5em;'>"+productivity.toLocaleString('ja-JP',{minimumFractionDigits:2,maximumFractionDigits:2})+"</span> 円<br>"+
+        "次月の時給: <span style='font-weight:bold; font-size:2em;'>"+wage.toLocaleString('ja-JP')+"</span> 円"+
+        additionalMessage;
+
+      updateTable(hours);
+    }
+
+    // 必要実績をトータルに計算
+    function updateTable(hours){
+      document.querySelectorAll('#wageTable tbody tr').forEach(function(row){
+        var threshold=parseFloat(row.getAttribute('data-threshold'));
+        var needSales=(threshold*hours)/10000;
+        row.querySelector('.need-sales').textContent=
+          needSales.toLocaleString('ja-JP',{minimumFractionDigits:1,maximumFractionDigits:1});
+      });
     }
   </script>
 </body>
