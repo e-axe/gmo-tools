@@ -7,15 +7,17 @@ export const WAGES = [
 ];
 export function productivity(sales,cools) {
   if(!Number.isFinite(sales)||sales<0||!Number.isFinite(cools)||cools<=0) return null;
-  const value=sales*10000/cools;
+  const value=(sales/cools)*10000;
   if(!Number.isFinite(value))return null;
   // Compare total sales to avoid boundary errors from dividing decimals.
   let index=0;
-  WAGES.forEach((item,i)=>{const required=item.threshold*cools/10000;if(sales>=required || Math.abs(sales-required)<=Number.EPSILON*Math.max(1,required)*8) index=i;});
+  WAGES.forEach((item,i)=>{const required=(item.threshold/10000)*cools;const tolerance=Number.EPSILON*Math.max(Math.abs(sales),Math.abs(required))*8;if(Number.isFinite(required)&&(sales>=required || Math.abs(sales-required)<=tolerance)) index=i;});
   const next=WAGES[index+1], second=WAGES[index+2];
-  const gap=item=>item?Math.max(0,(item.threshold*cools/10000)-sales):null;
-  return {value,index,wage:WAGES[index].wage,next,second,gap:gap(next),secondGap:gap(second),required:next?next.threshold*cools/10000:null};
+  const gap=item=>item?Math.max(0,(item.threshold/10000)*cools-sales):null;
+  return {value,index,wage:WAGES[index].wage,next,second,gap:gap(next),secondGap:gap(second),required:next?(next.threshold/10000)*cools:null};
 }
+// Never display a rounded-up value that appears to cross a wage threshold.
+export function displayProductivity(value){const scaled=value*100;return Number.isFinite(scaled)?Math.floor(scaled+Number.EPSILON*Math.abs(scaled)*4)/100:value;}
 export function isoDate(date) {return `${date.getUTCFullYear()}-${String(date.getUTCMonth()+1).padStart(2,'0')}-${String(date.getUTCDate()).padStart(2,'0')}`;}
 export function parseDate(value) {
   if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return null;

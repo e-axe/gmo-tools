@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {productivity,WAGES,businessDays,progress,readDateLines,monthBounds} from '../src/calculations.mjs';
+import {productivity,displayProductivity,WAGES,businessDays,progress,readDateLines,monthBounds} from '../src/calculations.mjs';
 import holidays from '../src/holidays.json' with {type:'json'};
 import {formatPhoneLine,formatPhoneText} from '../src/phone.mjs';
 test('productivity example, zero revenue and highest rank',()=>{
@@ -46,4 +46,12 @@ test('telephone preserves row order, blank lines and unresolved originals',()=>{
  assert.equal(r[2].status,'review');assert.equal(r[3].status,'invalid');assert.equal(r[4].status,'invalid');
  assert.equal(formatPhoneLine('11111111111').status,'review');
  assert.equal(formatPhoneLine('<script>alert(1)</script>').output,'<script>alert(1)</script>');
+});
+
+test('relative boundary tolerance never awards a higher wage for zero sales',()=>{
+ for(const cools of [1e-15,1e-20,1e-100,0.01,166.13])assert.equal(productivity(0,cools).wage,1500);
+ assert.equal(displayProductivity(productivity(104.99999,100).value),10499.99);
+ assert.equal(displayProductivity(productivity(105,100).value),10500);
+ assert.equal(productivity(1e300,1e300).wage,2700);
+ assert.ok(Number.isFinite(displayProductivity(1e308)));
 });
