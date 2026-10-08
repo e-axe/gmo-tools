@@ -1,234 +1,72 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GMO 対稼働計算ツール 2025</title>
-  <!-- Google Fonts: Roboto -->
-  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary-color: #4285f4;
-      --primary-hover: #357ae8;
-      --bg-color: #f0f4f8;
-      --card-bg: #ffffff;
-      --text-color: #333;
-      --success-color: #34A853;
-      --error-color: #EA4335;
-    }
-    
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: var(--bg-color);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    
-    .container {
-      background: var(--card-bg);
-      width: 100%;
-      max-width: 500px;
-      border-radius: 8px;
-      padding: 40px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-    
-    h1 {
-      text-align: center;
-      font-size: 1.8rem;
-      margin-bottom: 1.5rem;
-      color: var(--text-color);
-    }
-    
-    .input-group {
-      margin-bottom: 1.2rem;
-    }
-    
-    .input-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: #777;
-      font-size: 0.9rem;
-    }
-    
-    .input-group input {
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      transition: border 0.3s;
-    }
-    
-    .input-group input:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 5px rgba(66, 133, 244, 0.3);
-    }
-    
-    button {
-      width: 100%;
-      padding: 14px;
-      background: var(--primary-color);
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    
-    button:hover {
-      background: var(--primary-hover);
-    }
-    
-    .result {
-      margin-top: 2rem;
-      text-align: left;
-      font-size: 0.95rem;
-      color: var(--text-color);
-    }
-    
-    .result p {
-      margin-bottom: 0.8rem;
-    }
-    
-    .deviation {
-      margin-top: 1.5rem;
-      padding: 20px;
-      text-align: center;
-      font-size: 2rem;
-      font-weight: 500;
-      border-radius: 6px;
-      background: rgba(0, 0, 0, 0.03);
-    }
-  </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f6f8fa"><meta name="description" content="営業実績・クール数から生産性と時給を計算。営業日の進捗確認と電話番号の一括整形も、ひと画面で。">
+<title>対稼働｜GMO TOOLS</title><link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/styles.css?v=2"><script type="module" src="assets/app.js?v=2"></script>
 </head>
-<body>
-  <div class="container">
-    <h1>GMO 対稼働計算ツール 2025</h1>
-    <div class="input-group">
-      <label for="target">月間目標（万円）</label>
-      <input type="number" id="target" step="0.01" placeholder="例: 100">
-    </div>
-    <div class="input-group">
-      <label for="sales">売上数字（万円）</label>
-      <input type="number" id="sales" step="0.01" placeholder="例: 60">
-    </div>
-    <button id="calcButton" onclick="calculate()">計算する</button>
-    <div class="result" id="result"></div>
-      <p style="margin-top: 2em; font-size: 0.85rem; text-align: center; color: #777;">by 斧口</p>
-  </div>
-
-  <script>
-    // 2025年の祝日リスト（例）
-    var holidays = [
-      "2025-01-01", // 元日
-      "2025-01-13", // 成人の日
-      "2025-02-11", // 建国記念の日
-      "2025-02-23", // 天皇誕生日
-      "2025-02-24", // 振替休日
-      "2025-03-20", // 春分の日
-      "2025-04-29", // 昭和の日
-      "2025-05-03", // 憲法記念日
-      "2025-05-04", // みどりの日
-      "2025-05-05", // こどもの日
-      "2025-05-06", // 振替休日
-      "2025-07-21", // 海の日
-      "2025-08-11", // 山の日
-      "2025-09-15", // 敬老の日
-      "2025-09-23", // 秋分の日
-      "2025-10-13", // スポーツの日
-      "2025-11-03", // 文化の日
-      "2025-11-23", // 勤労感謝の日
-      "2025-11-24"  // 振替休日
-    ];
-
-    function isHoliday(date) {
-      var yyyy = date.getFullYear();
-      var mm = ('0' + (date.getMonth() + 1)).slice(-2);
-      var dd = ('0' + date.getDate()).slice(-2);
-      var formatted = yyyy + '-' + mm + '-' + dd;
-      return holidays.indexOf(formatted) !== -1;
-    }
-
-    function countBusinessDays(year, month) {
-      var lastDay = new Date(year, month + 1, 0);
-      var numDays = lastDay.getDate();
-      var count = 0;
-      for (var day = 1; day <= numDays; day++) {
-        var d = new Date(year, month, day);
-        var weekday = d.getDay();
-        if (weekday !== 0 && weekday !== 6 && !isHoliday(d)) {
-          count++;
-        }
-      }
-      return count;
-    }
-
-    function countElapsedBusinessDays(year, month, lastDay) {
-      var count = 0;
-      for (var day = 1; day <= lastDay; day++) {
-        var d = new Date(year, month, day);
-        var weekday = d.getDay();
-        if (weekday !== 0 && weekday !== 6 && !isHoliday(d)) {
-          count++;
-        }
-      }
-      return count;
-    }
-
-    function calculate() {
-      var targetInput = document.getElementById('target').value;
-      var salesInput = document.getElementById('sales').value;
-      var resultDiv = document.getElementById('result');
-
-      if (targetInput === '' || salesInput === '') {
-        resultDiv.innerHTML = '<p style="color: var(--error-color);">月間目標と売上数字の両方を入力してください。</p>';
-        return;
-      }
-
-      var target = parseFloat(targetInput);
-      var sales = parseFloat(salesInput);
-
-      var today = new Date();
-      var year = today.getFullYear();
-      var month = today.getMonth();
-      var yesterday = new Date(today.getTime() - 86400000);
-      var elapsedBusinessDays = (yesterday.getMonth() === month)
-          ? countElapsedBusinessDays(year, month, yesterday.getDate())
-          : 0;
-
-      var totalBusinessDays = countBusinessDays(year, month);
-      var dailyRequired = target / totalBusinessDays;
-      var expectedProgress = dailyRequired * elapsedBusinessDays;
-      var deviation = sales - expectedProgress;
-      var deviationColor = (deviation >= 0) ? 'var(--success-color)' : 'var(--error-color)';
-
-      var output  = '<p>今月の総営業日数： ' + totalBusinessDays + ' 日</p>';
-      output += '<p>昨日までの営業日数： ' + elapsedBusinessDays + ' 日</p>';
-      output += '<p>1日あたりの目標進捗額： ' + dailyRequired.toFixed(2) + ' 万円</p>';
-      output += '<p>昨日までの期待進捗額： ' + expectedProgress.toFixed(2) + ' 万円</p>';
-      output += '<div class="deviation" style="color:' + deviationColor + ';">対稼働（実績との差）： ' + deviation.toFixed(2) + ' 万円</div>';
-
-      resultDiv.innerHTML = output;
-    }
-
-    document.getElementById('target').addEventListener('keyup', function(event) {
-      if (event.key === 'Enter') calculate();
-    });
-    document.getElementById('sales').addEventListener('keyup', function(event) {
-      if (event.key === 'Enter') calculate();
-    });
-  </script>
-</body>
-</html>
+<body data-tool="progress">
+<a class="skip" href="#main">メインの操作へ</a>
+<div class="shell">
+<header class="header"><a class="brand" href="index.html" aria-label="GMO TOOLS ホーム"><span class="brand-mark">GMO</span><span>TOOLS</span></a><p>営業の毎日を、シンプルに。</p></header>
+<nav class="tool-nav" aria-label="ツール切替">
+<a href="seisansei.html" data-tool="productivity" ><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h2m4 0h2M8 16h2m4 0h2"/></svg>生産性・時給</a>
+<a href="taikadou2025.html" data-tool="progress" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V4m0 16h16M8 15l4-5 4 2 4-7"/></svg>対稼働</a>
+<a href="bangou_henkan.htm" data-tool="phone" ><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H4v4c0 7 6 13 13 13h4v-4l-5-2-2 2a16 16 0 0 1-6-6l2-2-2-5z"/></svg>電話番号整形</a>
+</nav>
+<main id="main">
+<section id="productivity" class="tool" hidden aria-labelledby="productivity-title">
+<div class="page-title"><span class="eyebrow">PRODUCTIVITY</span><h1 id="productivity-title">生産性・時給</h1><p>実績とクール数から、次の目標を確認。</p></div>
+<div class="calculator">
+<form id="productivity-form" novalidate>
+<div class="input-row">
+<div class="field"><label for="sales">営業実績</label><div class="input-unit"><input id="sales" type="number" inputmode="decimal" min="0" step="any" placeholder="例：100" aria-describedby="productivity-error"><span>万円</span></div></div>
+<div class="field"><label for="cools">クール数</label><div class="input-unit"><input id="cools" type="number" inputmode="decimal" min="0" step="any" placeholder="例：100" aria-describedby="productivity-error"><span>c</span></div></div>
+</div>
+<p id="productivity-error" class="field-error" role="status"></p>
+<div class="auto-note"><span></span>入力に合わせて、自動計算</div><button type="submit" class="sr-only">計算する</button>
+</form>
+<div id="productivity-empty" class="empty"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h2m4 0h2M8 16h2m4 0h2"/></svg><p>実績とクール数を入力してください</p><span>次月時給と、次の時給までの不足額が分かります。</span><button class="text-button" type="button" id="productivity-example">100万円・100cで試す</button></div>
+<div id="productivity-results" hidden>
+<div class="metrics"><div><h2>生産性</h2><p><strong id="productivity-value"></strong><span>円/c</span></p></div><div><h2>次月の時給 <span class="small-tag">現行設定</span></h2><p><strong id="wage-value" class="accent"></strong><span>円</span></p></div></div>
+<div class="goal-card"><h2 id="next-title"></h2><p id="gap-value" class="hero-number"></p><div id="goal-caption" class="goal-caption"></div></div>
+<p id="second-goal" class="secondary-result"></p>
+</div>
+<details class="disclosure"><summary>時給テーブルを見る</summary><div class="table-scroll"><table><caption>現行サイトから引き継いだ時給テーブル</caption><thead><tr><th scope="col">生産性（円/c）</th><th scope="col">次月時給（円）</th><th scope="col">必要実績（万円）</th></tr></thead><tbody id="wage-rows"></tbody></table></div><p class="helper">必要実績は入力クール数での合計額。現在と次のランクを表示します。</p></details>
+<div class="actions"><button type="button" class="button outline copy-button" id="copy-productivity" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M15 8V3H3v12h5"/></svg>結果をコピー</button><button type="button" class="button ghost" id="clear-productivity">クリア</button></div>
+</div>
+<details class="basis"><summary>計算基準・制度について</summary><p>生産性 ＝ 営業実績（万円）× 10,000 ÷ クール数。入力したクール数をそのまま分母に使用します。有給・残業の含め方は社内の集計基準に合わせてください。</p><p>時給は既存サイトの設定を使用しています。制度の適用開始日・最新改定との一致は未確認です。制度が改定された場合はテーブルの更新が必要です。</p><p>必要実績と不足額は、到達額を下回らないよう1円単位で切り上げ表示します。生産性の表示は小数点以下2桁まで。ランク判定は丸める前の数値で行います。</p></details>
+</section>
+<section id="progress" class="tool"  aria-labelledby="progress-title">
+<div class="page-title"><span class="eyebrow">SALES PROGRESS</span><h1 id="progress-title">対稼働</h1><p>営業日の経過に対して、実績のペースを確認。</p></div>
+<div class="calculator">
+<form id="progress-form" novalidate>
+<div class="date-row"><div class="month-switch"><button type="button" class="icon-button" id="previous-month" aria-label="前の月">‹</button><label class="sr-only" for="year">対象年</label><select id="year"></select><label class="sr-only" for="month">対象月</label><select id="month"></select><button type="button" class="icon-button" id="next-month" aria-label="次の月">›</button></div><button type="button" class="text-button" id="current-month">今月に戻す</button></div>
+<div class="input-row"><div class="field"><label for="target">月間目標</label><div class="input-unit"><input id="target" type="number" inputmode="decimal" min="0" step="any" placeholder="例：100" aria-describedby="progress-error"><span>万円</span></div></div><div class="field"><label for="actual">営業実績</label><div class="input-unit"><input id="actual" type="number" inputmode="decimal" min="0" step="any" placeholder="例：60" aria-describedby="progress-error"><span>万円</span></div></div></div>
+<div class="cutoff-row"><label for="cutoff">この日までの実績で計算</label><input type="date" id="cutoff" aria-describedby="cutoff-help progress-error"></div><p id="cutoff-help" class="helper">今月は昨日までが初期値。基準日を含めて計算します。</p>
+<details class="disclosure adjustments"><summary>会社の休日・稼働日を調整</summary><div class="input-row"><div class="field"><label for="closed">追加の休業日</label><textarea id="closed" rows="3" placeholder="2026-10-15&#10;1行に1日、YYYY-MM-DD形式"></textarea></div><div class="field"><label for="opened">追加の稼働日</label><textarea id="opened" rows="3" placeholder="2026-10-17&#10;土日・祝日の出勤日など"></textarea></div></div><p class="helper">土日・国民の祝日は自動除外。指定した追加稼働日は営業日に含めます。</p></details>
+<p id="progress-error" class="field-error" role="status"></p><div class="auto-note"><span></span>入力に合わせて、自動計算</div><button type="submit" class="sr-only">計算する</button>
+</form>
+<div id="progress-empty" class="empty"><p>月間目標と実績を入力してください</p><span>期待進捗との差額を、営業日数から算出します。</span></div>
+<div id="progress-results" hidden><div class="goal-card" id="progress-card"><h2 id="difference-title"></h2><p class="hero-number" id="difference-value"></p><div class="goal-caption" id="difference-caption"></div></div><div class="mini-metrics"><div><span>営業日数</span><strong id="days-value"></strong></div><div><span>1日あたりの目標</span><strong id="daily-value"></strong></div><div><span>月間達成率</span><strong id="achievement-value"></strong></div></div><p id="progress-context" class="secondary-result"></p></div>
+<div class="actions"><button type="button" class="button outline" id="copy-progress" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M15 8V3H3v12h5"/></svg>結果をコピー</button><button type="button" class="button ghost" id="clear-progress">クリア</button></div>
+</div>
+<details class="basis"><summary>営業日・計算基準について</summary><p>期待進捗 ＝ 月間目標 ÷ 月間営業日数 × 基準日までの営業日数。対稼働 ＝ 実績 − 期待進捗。</p><p>土日・国民の祝日・振替休日などを除外し、会社の休日・稼働日の調整を反映します。日付の初期値は日本時間（Asia/Tokyo）です。</p><p>祝日データ：<a href="https://www8.cao.go.jp/chosei/shukujitsu/gaiyou.html" target="_blank" rel="noopener noreferrer">内閣府「国民の祝日について」</a>（2020〜2027年、2026年10月9日確認）。対象期間外は計算しません。会社独自の休業日は上の調整欄で指定してください。</p></details>
+</section>
+<section id="phone" class="tool" hidden aria-labelledby="phone-title">
+<div class="page-title"><span class="eyebrow">PHONE FORMATTER</span><h1 id="phone-title">電話番号整形</h1><p>番号を貼り付けて、まとめて整形。</p></div>
+<div class="calculator phone-calculator"><div class="phone-editors"><div class="field"><label for="phone-input">入力 <span class="label-note">1行に1番号</span></label><textarea id="phone-input" spellcheck="false" rows="8" placeholder="09012345678&#10;0312345678&#10;0421234567" aria-describedby="phone-help"></textarea><p id="phone-help" class="helper">全角数字・ハイフン付き・+81形式にも対応。</p></div><div class="field"><label for="phone-output">変換結果 <span class="label-note" id="phone-count">未入力</span></label><textarea id="phone-output" spellcheck="false" rows="8" readonly placeholder="整形した番号がここに表示されます"></textarea><p class="helper">元の行順・空行を保持します。</p></div></div>
+<div id="phone-summary" class="phone-summary" hidden></div>
+<div class="actions"><button type="button" class="button primary" id="convert-phone">整形する</button><button type="button" class="button outline" id="copy-phone" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M15 8V3H3v12h5"/></svg>結果をコピー</button><button type="button" class="button ghost" id="clear-phone">クリア</button></div>
+<p class="helper center" id="phone-hint">Ctrl / ⌘ + Enter でも整形できます。</p>
+<details id="phone-review" class="disclosure" hidden open><summary id="phone-review-title">確認が必要な行</summary><ul id="phone-review-list" class="review-list"></ul></details>
+</div>
+<details class="basis"><summary>対応範囲・整形ルールについて</summary><p>日本の固定電話・携帯電話・IP電話・フリーダイヤル等を、日本の番号形式データに基づいて整形します。市外局番の桁数に応じて区切ります。</p><p>整形には libphonenumber-js 1.13.15 の日本用データを使用しています。番号の実在や接続は確認しません。海外の番号・内線・番号以外の文章は自動変換せず、原文を残して確認を促します。</p><p>「結果をコピー」は要確認・変換不可の行も含め、表示された結果をそのままコピーします。必要な行を確認してから転記してください。</p></details>
+</section>
+<noscript><p class="field-error">計算と整形にはJavaScriptを有効にしてください。</p></noscript>
+</main>
+<footer class="footer"><span>by 斧口</span><span>入力データはこの画面内で処理</span></footer>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body></html>

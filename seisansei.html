@@ -1,154 +1,72 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GMO 生産性判定装置</title>
-  <!-- Google FontsでRobotoを使用 -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    /* 全体の基本スタイル */
-    body { font-family: 'Roboto', sans-serif; background: #f7f7f7; margin: 0; padding: 0; color: #333; }
-    .container { max-width: 600px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    h1, h2 { text-align: center; margin-bottom: 20px; color: #444; }
-    /* フォーム */
-    form { margin-bottom: 30px; }
-    label { display: block; margin-bottom: 5px; font-weight: 500; }
-    input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box; }
-    button { width: 100%; padding: 12px; background: #007BFF; border: none; color: #fff; font-size: 18px; border-radius: 4px; cursor: pointer; transition: background 0.3s; }
-    button:hover { background: #0056b3; }
-    /* 結果表示エリア */
-    #result { text-align: center; margin: 20px 0 30px; padding: 20px; border: 2px solid #007BFF; border-radius: 8px; background: #e6f2ff; }
-    /* テーブル */
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    table th, table td { border: 1px solid #ddd; padding: 10px; text-align: center; font-size: 14px; }
-    table th { background: #f0f0f0; }
-  </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f6f8fa"><meta name="description" content="営業実績・クール数から生産性と時給を計算。営業日の進捗確認と電話番号の一括整形も、ひと画面で。">
+<title>生産性・時給｜GMO TOOLS</title><link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/styles.css?v=2"><script type="module" src="assets/app.js?v=2"></script>
 </head>
-<body>
-  <div class="container">
-    <h1>GMO 生産性判定装置</h1>
-    <form id="calcForm">
-      <label for="sales">営業成績（実績）の金額 (万円):</label>
-      <input type="number" id="sales" placeholder="例: 80" step="any" required>
-      <label for="hours">クール数（時間）:</label>
-      <input type="number" id="hours" placeholder="例: 120" step="any" required>
-      <button type="button" id="calcBtn">計算する</button>
-    </form>
-    <div id="result"></div>
-    <h2>次月の時給テーブル</h2>
-    <table id="wageTable">
-      <thead>
-        <tr>
-          <th>生産性 (円)</th>
-          <th>次月時間給 (円)</th>
-          <th>必要実績 (万円)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr data-threshold="15000"><td>15,000 以上</td><td>3,900</td><td class="need-sales">-</td></tr>
-        <tr data-threshold="13500"><td>13,500 ～ 15,000 未満</td><td>3,600</td><td class="need-sales">-</td></tr>
-        <tr data-threshold="12000"><td>12,000 ～ 13,500 未満</td><td>3,300</td><td class="need-sales">-</td></tr>
-        <tr data-threshold="10500"><td>10,500 ～ 12,000 未満</td><td>3,000</td><td class="need-sales">-</td></tr>
-        <tr data-threshold="9000"><td>9,000 ～ 10,500 未満</td><td>2,700</td><td class="need-sales">-</td></tr>
-        <tr data-threshold="7500"><td>7,500 ～ 9,000 未満</td><td>2,400</td><td class="need-sales">-</td></tr>
-        <tr data-threshold="6000"><td>6,000 ～ 7,500 未満</td><td>2,100</td><td class="need-sales">-</td></tr>
-        <tr data-threshold="4500"><td>4,500 ～ 6,000 未満</td><td>1,850</td><td class="need-sales">-</td></tr>
-        <tr data-threshold="3000"><td>3,000 ～ 4,500 未満</td><td>1,650</td><td class="need-sales">-</td></tr>
-        <tr data-threshold="0"><td>3,000 未満</td><td>1,500</td><td class="need-sales">-</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p style="margin-top:2em; font-size:0.85rem; text-align:center; color:#777;">by 斧口</p>
-  <script>
-    // 計算ボタン押下でcalculateを呼び出し
-    document.getElementById('calcBtn').addEventListener('click', calculate);
-    // Enterキーでもcalculate
-    ['sales','hours'].forEach(function(id) {
-      document.getElementById(id).addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          calculate();
-        }
-      });
-    });
-
-    function calculate() {
-      var salesInput = parseFloat(document.getElementById('sales').value);
-      var hours = parseFloat(document.getElementById('hours').value);
-      var resultDiv = document.getElementById('result');
-      if (isNaN(salesInput) || isNaN(hours) || hours <= 0) {
-        resultDiv.innerHTML = "<p style='color:red;'>正しい値を入力してください。</p>";
-        return;
-      }
-      var sales = salesInput * 10000;
-      var productivity = sales / hours;
-      var wage = 0;
-      if      (productivity >= 15000) wage = 3900;
-      else if (productivity >= 13500) wage = 3600;
-      else if (productivity >= 12000) wage = 3300;
-      else if (productivity >= 10500) wage = 3000;
-      else if (productivity >= 9000)  wage = 2700;
-      else if (productivity >= 7500)  wage = 2400;
-      else if (productivity >= 6000)  wage = 2100;
-      else if (productivity >= 4500)  wage = 1850;
-      else if (productivity >= 3000)  wage = 1650;
-      else                             wage = 1500;
-
-      // 元の計算結果＋追加メッセージ
-      var mapping = [
-        {threshold:3000, wage:1650}, {threshold:4500, wage:1850},
-        {threshold:6000, wage:2100},{threshold:7500, wage:2400},
-        {threshold:9000, wage:2700},{threshold:10500, wage:3000},
-        {threshold:12000, wage:3300},{threshold:13500, wage:3600},
-        {threshold:15000, wage:3900}
-      ];
-      var nextThreshold=null,nextWage=null,nextIndex=-1;
-      for(var i=0;i<mapping.length;i++){
-        if(productivity<mapping[i].threshold){
-          nextThreshold=mapping[i].threshold;
-          nextWage=mapping[i].wage;
-          nextIndex=i;break;
-        }
-      }
-      var secondThreshold=null,secondWage=null;
-      if(nextIndex>=0 && nextIndex+1<mapping.length){
-        secondThreshold=mapping[nextIndex+1].threshold;
-        secondWage   =mapping[nextIndex+1].wage;
-      }
-      var additionalMessage="";
-      if(nextThreshold!==null){
-        var add   =(nextThreshold-productivity)*hours;
-        var addMan=add/10000;
-        additionalMessage="<br>次の時給 ("+nextWage.toLocaleString('ja-JP')+"円)に到達するには、あと 「<span style='font-weight:bold; font-size:1.5em;'>"+addMan.toLocaleString('ja-JP')+"</span>」 万円の実績が必要です。";
-        if(secondThreshold!==null){
-          var add2   =(secondThreshold-productivity)*hours;
-          var addMan2=add2/10000;
-          additionalMessage+="<br>さらに次の時給 ("+secondWage.toLocaleString('ja-JP')+"円)に到達するには、あと 「<span style='font-weight:bold; font-size:1.5em;'>"+addMan2.toLocaleString('ja-JP')+"</span>」 万円の実績が必要です。";
-        }
-      } else {
-        additionalMessage="<br>既に最高の生産性です。";
-      }
-      resultDiv.innerHTML=
-        "<strong style='font-size:1.5em;'>計算結果</strong><br>"+
-        "生産性: <span style='font-weight:bold; font-size:1.5em;'>"+productivity.toLocaleString('ja-JP',{minimumFractionDigits:2,maximumFractionDigits:2})+"</span> 円<br>"+
-        "次月の時給: <span style='font-weight:bold; font-size:2em;'>"+wage.toLocaleString('ja-JP')+"</span> 円"+
-        additionalMessage;
-
-      updateTable(hours);
-    }
-
-    // 必要実績をトータルに計算
-    function updateTable(hours){
-      document.querySelectorAll('#wageTable tbody tr').forEach(function(row){
-        var threshold=parseFloat(row.getAttribute('data-threshold'));
-        var needSales=(threshold*hours)/10000;
-        row.querySelector('.need-sales').textContent=
-          needSales.toLocaleString('ja-JP',{minimumFractionDigits:1,maximumFractionDigits:1});
-      });
-    }
-  </script>
-</body>
-</html>
+<body data-tool="productivity">
+<a class="skip" href="#main">メインの操作へ</a>
+<div class="shell">
+<header class="header"><a class="brand" href="index.html" aria-label="GMO TOOLS ホーム"><span class="brand-mark">GMO</span><span>TOOLS</span></a><p>営業の毎日を、シンプルに。</p></header>
+<nav class="tool-nav" aria-label="ツール切替">
+<a href="seisansei.html" data-tool="productivity" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h2m4 0h2M8 16h2m4 0h2"/></svg>生産性・時給</a>
+<a href="taikadou2025.html" data-tool="progress" ><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V4m0 16h16M8 15l4-5 4 2 4-7"/></svg>対稼働</a>
+<a href="bangou_henkan.htm" data-tool="phone" ><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H4v4c0 7 6 13 13 13h4v-4l-5-2-2 2a16 16 0 0 1-6-6l2-2-2-5z"/></svg>電話番号整形</a>
+</nav>
+<main id="main">
+<section id="productivity" class="tool"  aria-labelledby="productivity-title">
+<div class="page-title"><span class="eyebrow">PRODUCTIVITY</span><h1 id="productivity-title">生産性・時給</h1><p>実績とクール数から、次の目標を確認。</p></div>
+<div class="calculator">
+<form id="productivity-form" novalidate>
+<div class="input-row">
+<div class="field"><label for="sales">営業実績</label><div class="input-unit"><input id="sales" type="number" inputmode="decimal" min="0" step="any" placeholder="例：100" aria-describedby="productivity-error"><span>万円</span></div></div>
+<div class="field"><label for="cools">クール数</label><div class="input-unit"><input id="cools" type="number" inputmode="decimal" min="0" step="any" placeholder="例：100" aria-describedby="productivity-error"><span>c</span></div></div>
+</div>
+<p id="productivity-error" class="field-error" role="status"></p>
+<div class="auto-note"><span></span>入力に合わせて、自動計算</div><button type="submit" class="sr-only">計算する</button>
+</form>
+<div id="productivity-empty" class="empty"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h2m4 0h2M8 16h2m4 0h2"/></svg><p>実績とクール数を入力してください</p><span>次月時給と、次の時給までの不足額が分かります。</span><button class="text-button" type="button" id="productivity-example">100万円・100cで試す</button></div>
+<div id="productivity-results" hidden>
+<div class="metrics"><div><h2>生産性</h2><p><strong id="productivity-value"></strong><span>円/c</span></p></div><div><h2>次月の時給 <span class="small-tag">現行設定</span></h2><p><strong id="wage-value" class="accent"></strong><span>円</span></p></div></div>
+<div class="goal-card"><h2 id="next-title"></h2><p id="gap-value" class="hero-number"></p><div id="goal-caption" class="goal-caption"></div></div>
+<p id="second-goal" class="secondary-result"></p>
+</div>
+<details class="disclosure"><summary>時給テーブルを見る</summary><div class="table-scroll"><table><caption>現行サイトから引き継いだ時給テーブル</caption><thead><tr><th scope="col">生産性（円/c）</th><th scope="col">次月時給（円）</th><th scope="col">必要実績（万円）</th></tr></thead><tbody id="wage-rows"></tbody></table></div><p class="helper">必要実績は入力クール数での合計額。現在と次のランクを表示します。</p></details>
+<div class="actions"><button type="button" class="button outline copy-button" id="copy-productivity" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M15 8V3H3v12h5"/></svg>結果をコピー</button><button type="button" class="button ghost" id="clear-productivity">クリア</button></div>
+</div>
+<details class="basis"><summary>計算基準・制度について</summary><p>生産性 ＝ 営業実績（万円）× 10,000 ÷ クール数。入力したクール数をそのまま分母に使用します。有給・残業の含め方は社内の集計基準に合わせてください。</p><p>時給は既存サイトの設定を使用しています。制度の適用開始日・最新改定との一致は未確認です。制度が改定された場合はテーブルの更新が必要です。</p><p>必要実績と不足額は、到達額を下回らないよう1円単位で切り上げ表示します。生産性の表示は小数点以下2桁まで。ランク判定は丸める前の数値で行います。</p></details>
+</section>
+<section id="progress" class="tool" hidden aria-labelledby="progress-title">
+<div class="page-title"><span class="eyebrow">SALES PROGRESS</span><h1 id="progress-title">対稼働</h1><p>営業日の経過に対して、実績のペースを確認。</p></div>
+<div class="calculator">
+<form id="progress-form" novalidate>
+<div class="date-row"><div class="month-switch"><button type="button" class="icon-button" id="previous-month" aria-label="前の月">‹</button><label class="sr-only" for="year">対象年</label><select id="year"></select><label class="sr-only" for="month">対象月</label><select id="month"></select><button type="button" class="icon-button" id="next-month" aria-label="次の月">›</button></div><button type="button" class="text-button" id="current-month">今月に戻す</button></div>
+<div class="input-row"><div class="field"><label for="target">月間目標</label><div class="input-unit"><input id="target" type="number" inputmode="decimal" min="0" step="any" placeholder="例：100" aria-describedby="progress-error"><span>万円</span></div></div><div class="field"><label for="actual">営業実績</label><div class="input-unit"><input id="actual" type="number" inputmode="decimal" min="0" step="any" placeholder="例：60" aria-describedby="progress-error"><span>万円</span></div></div></div>
+<div class="cutoff-row"><label for="cutoff">この日までの実績で計算</label><input type="date" id="cutoff" aria-describedby="cutoff-help progress-error"></div><p id="cutoff-help" class="helper">今月は昨日までが初期値。基準日を含めて計算します。</p>
+<details class="disclosure adjustments"><summary>会社の休日・稼働日を調整</summary><div class="input-row"><div class="field"><label for="closed">追加の休業日</label><textarea id="closed" rows="3" placeholder="2026-10-15&#10;1行に1日、YYYY-MM-DD形式"></textarea></div><div class="field"><label for="opened">追加の稼働日</label><textarea id="opened" rows="3" placeholder="2026-10-17&#10;土日・祝日の出勤日など"></textarea></div></div><p class="helper">土日・国民の祝日は自動除外。指定した追加稼働日は営業日に含めます。</p></details>
+<p id="progress-error" class="field-error" role="status"></p><div class="auto-note"><span></span>入力に合わせて、自動計算</div><button type="submit" class="sr-only">計算する</button>
+</form>
+<div id="progress-empty" class="empty"><p>月間目標と実績を入力してください</p><span>期待進捗との差額を、営業日数から算出します。</span></div>
+<div id="progress-results" hidden><div class="goal-card" id="progress-card"><h2 id="difference-title"></h2><p class="hero-number" id="difference-value"></p><div class="goal-caption" id="difference-caption"></div></div><div class="mini-metrics"><div><span>営業日数</span><strong id="days-value"></strong></div><div><span>1日あたりの目標</span><strong id="daily-value"></strong></div><div><span>月間達成率</span><strong id="achievement-value"></strong></div></div><p id="progress-context" class="secondary-result"></p></div>
+<div class="actions"><button type="button" class="button outline" id="copy-progress" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M15 8V3H3v12h5"/></svg>結果をコピー</button><button type="button" class="button ghost" id="clear-progress">クリア</button></div>
+</div>
+<details class="basis"><summary>営業日・計算基準について</summary><p>期待進捗 ＝ 月間目標 ÷ 月間営業日数 × 基準日までの営業日数。対稼働 ＝ 実績 − 期待進捗。</p><p>土日・国民の祝日・振替休日などを除外し、会社の休日・稼働日の調整を反映します。日付の初期値は日本時間（Asia/Tokyo）です。</p><p>祝日データ：<a href="https://www8.cao.go.jp/chosei/shukujitsu/gaiyou.html" target="_blank" rel="noopener noreferrer">内閣府「国民の祝日について」</a>（2020〜2027年、2026年10月9日確認）。対象期間外は計算しません。会社独自の休業日は上の調整欄で指定してください。</p></details>
+</section>
+<section id="phone" class="tool" hidden aria-labelledby="phone-title">
+<div class="page-title"><span class="eyebrow">PHONE FORMATTER</span><h1 id="phone-title">電話番号整形</h1><p>番号を貼り付けて、まとめて整形。</p></div>
+<div class="calculator phone-calculator"><div class="phone-editors"><div class="field"><label for="phone-input">入力 <span class="label-note">1行に1番号</span></label><textarea id="phone-input" spellcheck="false" rows="8" placeholder="09012345678&#10;0312345678&#10;0421234567" aria-describedby="phone-help"></textarea><p id="phone-help" class="helper">全角数字・ハイフン付き・+81形式にも対応。</p></div><div class="field"><label for="phone-output">変換結果 <span class="label-note" id="phone-count">未入力</span></label><textarea id="phone-output" spellcheck="false" rows="8" readonly placeholder="整形した番号がここに表示されます"></textarea><p class="helper">元の行順・空行を保持します。</p></div></div>
+<div id="phone-summary" class="phone-summary" hidden></div>
+<div class="actions"><button type="button" class="button primary" id="convert-phone">整形する</button><button type="button" class="button outline" id="copy-phone" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M15 8V3H3v12h5"/></svg>結果をコピー</button><button type="button" class="button ghost" id="clear-phone">クリア</button></div>
+<p class="helper center" id="phone-hint">Ctrl / ⌘ + Enter でも整形できます。</p>
+<details id="phone-review" class="disclosure" hidden open><summary id="phone-review-title">確認が必要な行</summary><ul id="phone-review-list" class="review-list"></ul></details>
+</div>
+<details class="basis"><summary>対応範囲・整形ルールについて</summary><p>日本の固定電話・携帯電話・IP電話・フリーダイヤル等を、日本の番号形式データに基づいて整形します。市外局番の桁数に応じて区切ります。</p><p>整形には libphonenumber-js 1.13.15 の日本用データを使用しています。番号の実在や接続は確認しません。海外の番号・内線・番号以外の文章は自動変換せず、原文を残して確認を促します。</p><p>「結果をコピー」は要確認・変換不可の行も含め、表示された結果をそのままコピーします。必要な行を確認してから転記してください。</p></details>
+</section>
+<noscript><p class="field-error">計算と整形にはJavaScriptを有効にしてください。</p></noscript>
+</main>
+<footer class="footer"><span>by 斧口</span><span>入力データはこの画面内で処理</span></footer>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body></html>
