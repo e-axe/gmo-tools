@@ -107,3 +107,9 @@ table,th,td{font-size:14px}caption{font-size:13px}.rank-tag,.small-tag{font-size
 /* Restore the stronger original type for emphasis and key figures. */
 .input-unit input,.metrics strong,.hero-number strong,.mini-metrics strong,h1,h2,label,.tool-nav a,.button{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;font-synthesis:weight}
 .metrics strong{font-weight:750;letter-spacing:-.05em}.hero-number strong{font-weight:750;letter-spacing:-.035em}.input-unit input{font-weight:650}.mini-metrics strong{font-weight:700}.page-title h1{font-weight:800}.metrics h2,.goal-card h2,label{font-weight:700}
+
+/* Text brand and stronger emphasis throughout the working surface. */
+.brand{display:inline-flex;flex-direction:row;align-items:center;gap:5px;font-size:22px;font-weight:800;letter-spacing:-.7px;line-height:1.4}.brand-mark{color:var(--brand);font-weight:900}
+body{font-weight:500}.page-title h1{font-weight:900}.field label,.metrics h2,.goal-card h2,.tool-nav a,.button,.text-button,.disclosure summary,.basis summary{font-weight:750}.metrics strong,.hero-number strong{font-weight:850}.input-unit input,.mini-metrics strong,.goal-caption strong{font-weight:800}
+@media(max-width:760px){.brand{font-size:20px}}
+@media(max-width:520px){.header p{max-width:135px}}
