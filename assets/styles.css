@@ -76,3 +76,21 @@ dialog h2{font-size:18px}dialog textarea{margin-top:12px}
 
 input::placeholder,textarea::placeholder{color:#657486}.auto-note,.eyebrow{color:#647586}.footer{font-size:11px;color:#647586}
 @media(max-width:520px){.header p{font-size:12px}.footer{font-size:11px}}
+
+/* Shared typography across desktop and mobile; readable labels and tabular figures. */
+:root{font-family:"Noto Sans JP",Arial,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;font-size:16px;--muted:#526273;font-synthesis:weight}
+body{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+.brand{font-family:Arial,"Noto Sans JP",sans-serif;letter-spacing:0;font-weight:700}.brand-mark{font-weight:700}
+.eyebrow{font-family:Arial,sans-serif;font-size:12px;letter-spacing:.12em}
+.header p,.page-title>p,.field label,.metrics h2,.metrics p>span,.goal-card h2,.goal-caption,.secondary-result,.helper,.basis,.auto-note,.result-assumption,.mini-metrics span,.disclosure summary,.cutoff-row label,.adjustments label,.label-note,.field-error,.phone-summary,.review-list li{font-size:14px;line-height:1.75}
+.tool-nav a,.button,.text-button{font-size:14px;font-weight:600}
+.input-unit input,.metrics strong,.hero-number strong,.mini-metrics strong{font-family:Arial,"Noto Sans JP",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:0;color:var(--text)}
+.metrics strong.accent{color:var(--brand)}
+.input-unit input{font-size:26px;font-weight:600;color:var(--text)}
+.metrics strong{font-size:clamp(30px,3.6vw,44px);font-weight:700}
+.hero-number strong{font-size:clamp(40px,4.5vw,56px);font-weight:700;color:inherit}
+.input-unit>span{font-size:14px;color:#526273}.metrics h2,.auto-note,.goal-caption,.disclosure summary{color:#47596b}
+table,th,td{font-size:14px}caption{font-size:13px}.rank-tag,.small-tag{font-size:12px}.footer{font-size:12px}
+.phone-editors textarea,.adjustments textarea,.cutoff-row input{font-size:16px}.mini-metrics strong{font-size:19px}.review-list strong{font-size:14px}
+@media(min-width:761px){.calculator{padding:32px}.page-title h1{font-size:32px}.input-row{gap:24px}.metrics{margin-bottom:26px}.goal-card{padding:24px}.goal-caption{margin-top:12px}.result-stage{grid-template-rows:minmax(350px,auto)}}
+@media(max-width:520px){.shell{padding:0 16px}.header p{font-size:12px}.tool-nav a{font-size:13px;white-space:normal;line-height:1.5;min-width:0}.page-title h1{font-size:26px}.page-title>p{font-size:14px}.input-unit input{font-size:24px}.metrics strong{font-size:clamp(26px,7.5vw,34px)}.metrics h2,.metrics p>span{font-size:14px}.metrics p{gap:4px}.hero-number strong{font-size:44px}.goal-caption{padding:10px 8px}.goal-caption .separator{margin:0 4px}.goal-card{padding:20px 12px 14px}.mini-metrics{grid-template-columns:1fr 1fr}.mini-metrics>div:last-child{grid-column:1/-1}.mini-metrics strong{font-size:18px}.result-stage{grid-template-rows:minmax(360px,auto)}.secondary-result{margin:16px 0}.number-controls button{width:44px}.basis summary{min-height:44px}}
