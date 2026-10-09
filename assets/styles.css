@@ -96,3 +96,10 @@ table,th,td{font-size:14px}caption{font-size:13px}.rank-tag,.small-tag{font-size
 @media(max-width:520px){.shell{padding:0 16px}.header p{font-size:12px}.tool-nav a{font-size:13px;white-space:normal;line-height:1.5;min-width:0}.page-title h1{font-size:26px}.page-title>p{font-size:14px}.input-unit input{font-size:24px}.metrics strong{font-size:clamp(26px,7.5vw,34px)}.metrics h2,.metrics p>span{font-size:14px}.metrics p{gap:4px}.hero-number strong{font-size:44px}.goal-caption{padding:10px 8px}.goal-caption .separator{margin:0 4px}.goal-card{padding:20px 12px 14px}.mini-metrics{grid-template-columns:1fr 1fr}.mini-metrics>div:last-child{grid-column:1/-1}.mini-metrics strong{font-size:18px}.result-stage{grid-template-rows:minmax(360px,auto)}.secondary-result{margin:16px 0}.number-controls button{width:44px}.basis summary{min-height:44px}}
 
 .input-unit>span{flex-shrink:0;white-space:nowrap}.number-controls{flex-shrink:0}
+
+/* Restore the earlier title typography; preserve the official wordmark. */
+.page-title h1,.page-title .eyebrow,.brand{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;font-synthesis:none}
+.page-title .eyebrow{font-size:10px;letter-spacing:.16em;font-weight:700}
+.page-title h1{font-size:30px}.brand{display:flex;flex-direction:column;align-items:flex-start;gap:7px;letter-spacing:.08em;font-size:16px;line-height:1.2;font-weight:700}.gmo-logo{display:block;width:220px;height:auto;max-width:100%;object-fit:contain}
+@media(max-width:760px){.page-title h1{font-size:27px}}
+@media(max-width:520px){.page-title h1{font-size:26px}.gmo-logo{width:180px}.brand{font-size:14px;gap:6px}.header{gap:12px}.header p{max-width:115px}}
