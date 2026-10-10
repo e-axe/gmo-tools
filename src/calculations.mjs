@@ -32,7 +32,7 @@ export function businessDays(year,month,cutoff,holidays,closed=[],opened=[]) {
   const closedSet=new Set(closed), openedSet=new Set(opened);
   for(let day=1;day<=Number(bounds.last.slice(-2));day++) {
     const date=new Date(Date.UTC(year,month-1,day)), iso=isoDate(date), weekday=date.getUTCDay();
-    const business=openedSet.has(iso)||(!closedSet.has(iso)&&weekday!==0&&weekday!==6&&!Object.hasOwn(holidays,iso));
+    const business=openedSet.has(iso)||(!closedSet.has(iso)&&weekday!==0&&weekday!==6&&!Object.prototype.hasOwnProperty.call(holidays,iso));
     if(business){total++;if(iso<=cutoff)elapsed++;}
   }
   return {total,elapsed,remaining:total-elapsed};
